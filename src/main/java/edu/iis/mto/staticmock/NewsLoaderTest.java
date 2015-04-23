@@ -66,6 +66,6 @@ public class NewsLoaderTest {
 		
 		// THEN:
 		assertEquals(testPublicContent.size(), 1);
-		assertEquals(testSubscribentContent.size(), 0);
+		assertEquals(testSubscribentContent.size(), 1);
 	}
 }
