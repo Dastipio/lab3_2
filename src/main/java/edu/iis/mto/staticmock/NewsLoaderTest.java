@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-
+import static org.mockito.Mockito.verify;
 import static org.junit.Assert.*;
 import edu.iis.mto.staticmock.reader.FileNewsReader;
 import static org.mockito.Mockito.when;
@@ -103,6 +103,37 @@ public class NewsLoaderTest {
 
 		// THEN:
 		assertEquals(testSubscribentContent.size(), 1);
+	}
+
+	@Test
+	public void loadNews_shouldCallLoadConfigurationOnce() {
+
+		// GIVEN:
+		IncomingNews incomingNews = new IncomingNews();
+
+		// mock Configuration
+		Configuration configuration = mock(Configuration.class);
+		when(configuration.getReaderType()).thenReturn("File");
+
+		// mock ConfigurationLoader
+		mockStatic(ConfigurationLoader.class);
+		ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
+		when(ConfigurationLoader.getInstance()).thenReturn(configurationLoader);
+		when(configurationLoader.loadConfiguration()).thenReturn(configuration);
+
+		// mock FileNewsReader
+		FileNewsReader reader = mock(FileNewsReader.class);
+		when(reader.read()).thenReturn(incomingNews);
+
+		// mock NewsReaderFactory
+		mockStatic(NewsReaderFactory.class);
+		when(NewsReaderFactory.getReader((String) Mockito.any())).thenReturn(
+				reader);
+
+		NewsLoader loader = new NewsLoader();
+		loader.loadNews();
+
+		verify(configurationLoader).loadConfiguration();
 	}
 
 }
